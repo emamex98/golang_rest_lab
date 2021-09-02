@@ -53,7 +53,7 @@ Some test cases were included in this project to test each endpoint. Here's how 
     go run api.go
     ```
 
-1. To run all tests with verobse:
+1. Run all tests with verobse in a separate terminal:
 
     ```go
     go test -v
@@ -109,7 +109,7 @@ Get the list of all available city codes.
 ]
 ```
 
-### 2. Single City 
+### 3. Single City 
 Get the details of a specific city, such as name and current date & time.
 
 **URL** : `/api/cities/{code}`
@@ -131,3 +131,8 @@ Get the details of a specific city, such as name and current date & time.
 }
 ```
 
+-------
+
+## Libraries and APIs used
+- WorldClockAPI: http://worldclockapi.com
+- Gorilla/Mux Router: https://github.com/gorilla/mux
