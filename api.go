@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -86,9 +87,14 @@ func getCityCodes() (codes []cityCode) {
 	return
 }
 
-func getTime(code string) (data timeStruct) {
+func getTime(code string) (data timeStruct, e error) {
 
 	index := getCityIndex(code)
+
+	if index == -1 {
+		return data, errors.New("invalid city code")
+	}
+
 	timezone := cities[index].Tmzn
 
 	resp, err := http.Get("http://worldclockapi.com/api/json/" + timezone + "/now")
@@ -104,7 +110,7 @@ func getTime(code string) (data timeStruct) {
 	json.Unmarshal(body, &data)
 	data.CityName = cities[index].Name
 
-	return data
+	return data, nil
 }
 
 func helloWorld(w http.ResponseWriter, r *http.Request) {
@@ -122,8 +128,12 @@ func getCitiesList(w http.ResponseWriter, r *http.Request) {
 func getTimeRest(w http.ResponseWriter, r *http.Request) {
 	args := mux.Vars(r)
 	code := strings.ToUpper(args["code"])
-	resp := getTime(code)
-	fmt.Fprintf(w, `{ "Code" : "`+code+`", "Name": "`+resp.CityName+`", "Date & Time": "`+resp.CurrentDateTime+`" }`)
+	resp, err := getTime(code)
+	if err != nil {
+		fmt.Fprintf(w, `{ "Error" : "`+err.Error()+`" }`)
+	} else {
+		fmt.Fprintf(w, `{ "Code" : "`+code+`", "Name": "`+resp.CityName+`", "DateTime": "`+resp.CurrentDateTime+`" }`)
+	}
 	fmt.Println("Endpoint reached: getTimeRest")
 }
 
